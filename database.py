@@ -4,7 +4,6 @@
 # data is stored in the form of task_name, task_status and current date
 
 import sqlite3
-from datetime import date
 
 class DataBase():
     def __init__(self):
@@ -25,9 +24,8 @@ class DataBase():
         self.cur.execute("SELECT * FROM Task_data")
         return self.cur.fetchall()
 
-    def add_data(self, name, status=0):
+    def add_data(self, name, status=0, current_date = 0):
         try:
-            current_date = date.today().strftime("%Y-%m-%d")
             self.cur.execute(
                 "INSERT INTO Task_data (name, status, date_added) VALUES (?, ?, ?)",
                 (name, status, current_date),
@@ -37,9 +35,8 @@ class DataBase():
         except Exception as e:
             return f"Error occurred while adding data: {e}: "
 
-    def update_data(self, name, new_name, status=0):
+    def update_data(self, name, new_name, status=0, current_date=0):
         try:
-            current_date = date.today().strftime("%Y-%m-%d")
             self.cur.execute(
                 "UPDATE Task_data SET name=?, status=?, date_added=? WHERE name=?",
                 (new_name, status, current_date, name),
