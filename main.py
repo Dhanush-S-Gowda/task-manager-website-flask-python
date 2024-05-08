@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
 from database import DataBase
+from datetime import date
 
 app = Flask(__name__)
 
@@ -21,7 +22,8 @@ def index():
 def add_task():
     task_name = request.form['newtask']
     db = get_db()
-    db.add_data(task_name)
+    current_date = date.today().strftime("%Y-%m-%d")
+    db.add_data(task_name, current_date=current_date)
     return redirect(url_for('index'))
 
 @app.route('/delete/<name>', methods=['GET', 'POST'])
@@ -38,7 +40,8 @@ def update_task(old_name):
         new_name = request.json.get('newName')  
         status = request.json.get('status') 
         db = get_db()
-        result = db.update_data(old_name, new_name, status)
+        current_date = date.today().strftime("%Y-%m-%d")
+        result = db.update_data(old_name, new_name, status, current_date=current_date)
         return redirect(url_for('index'))
 
 
