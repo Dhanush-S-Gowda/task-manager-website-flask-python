@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="static/style.css" />
+    <title>Task Manager</title>
+  </head>
+  <body>
+    <div class="container">
+      <h2 class="heading">Task Manager</h2>
+      <p class="sub-heading">
+        Add tasks and click on status checkbox to change it to completed tasks
+      </p>
+
+      <div class="box">
+        <table>
+          <tr>
+            <th class="table-header">Sl no.</th>
+            <th class="table-header">Task</th>
+            <th class="table-header">Status</th>
+            <th class="table-header">Actions</th>
+          </tr>
+          {% for index, task in tasks|enumerate(1) %}
+          <tr class="task">
+            <td>{{ index }}</td>
+            <td class="taskname">{{ task[0] }}<br /><i>{{ task[2] }}</i></td>
+            <td>
+              <input type="checkbox" id="status{{ task[0] }}" {% if task[1] == 1
+              %}checked{% endif %} onchange="updateStatus('{{ task[0] }}')" />
+            </td>
+            <td>
+              <button class="action-btn" onclick="editTask('{{ task[0] }}')">
+                Edit
+              </button>
+              <button class="action-btn" onclick="deleteTask('{{ task[0] }}')">
+                Delete
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+
+      <div class="forms-container">
+        <div class="box">
+          <form action="{{ url_for('add_task') }}" method="post">
+            <textarea
+              id="newtask"
+              name="newtask"
+              placeholder="New task"
+            ></textarea>
+            <button type="submit" class="action-btn">Add event</button>
+          </form>
+        </div>
+
+        <div class="box">
+          <form>
+            <textarea
+              id="edittask"
+              name="edittask"
+              placeholder="Edit task"
+            ></textarea>
+            <button type="submit" class="action-btn" onclick="saveEdit()">
+              Save Edit
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script>
+      var old_name = null;
+
+      function updateStatus(name) {
+        var checkbox = document.getElementById("status" + name);
+        var status = checkbox.checked ? 1 : 0;
+        fetch("/update/" + name, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ newName: name, status: status }),
+        })
+          .then((response) => {
+            if (response.ok) {
+              console.log("Status updated successfully");
+            } else {
+              console.error("Failed to update status");
+            }
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+
+      function deleteTask(name) {
+        if (confirm("Are you sure you want to delete this task?")) {
+          fetch("/delete/" + name, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ name: name }),
+          })
+            .then(() => {
+              window.location.href = "/";
+            })
+            .catch((error) => console.error("Error:", error));
+        }
+      }
+
+      function editTask(name) {
+        document.getElementById("edittask").value = name;
+        old_name = name;
+      }
+
+      function saveEdit() {
+        var oldName = old_name;
+        var newName = document.getElementById("edittask").value;
+
+        if (confirm("Are you sure you want to update this task?")) {
+          fetch("/update/" + oldName, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ oldName: oldName, newName: newName }),
+          })
+            .then(() => {
+              window.location.href = "/";
+            })
+            .catch((error) => console.error("Error:", error));
+        }
+      }
+    </script>
+  </body>
+</html>
