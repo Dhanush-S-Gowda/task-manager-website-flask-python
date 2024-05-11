@@ -24,7 +24,7 @@ def add_task():
     if len(task_name.strip())>0:
         db = get_db()
         current_date = date.today().strftime("%Y-%m-%d")
-        db.add_data(task_name, current_date=current_date)
+        db.add_data(task_name.strip(), current_date=current_date)
     return redirect(url_for('index'))
         
 
