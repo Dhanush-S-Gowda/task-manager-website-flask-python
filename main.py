@@ -21,10 +21,12 @@ def index():
 @app.route('/add', methods=['POST'])
 def add_task():
     task_name = request.form['newtask']
-    db = get_db()
-    current_date = date.today().strftime("%Y-%m-%d")
-    db.add_data(task_name, current_date=current_date)
+    if len(task_name)>0:
+        db = get_db()
+        current_date = date.today().strftime("%Y-%m-%d")
+        db.add_data(task_name, current_date=current_date)
     return redirect(url_for('index'))
+        
 
 @app.route('/delete/<name>', methods=['GET', 'POST'])
 def delete_task(name):
