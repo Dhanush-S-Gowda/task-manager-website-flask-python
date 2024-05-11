@@ -21,7 +21,7 @@ def index():
 @app.route('/add', methods=['POST'])
 def add_task():
     task_name = request.form['newtask']
-    if len(task_name)>0:
+    if len(task_name.strip())>0:
         db = get_db()
         current_date = date.today().strftime("%Y-%m-%d")
         db.add_data(task_name, current_date=current_date)
